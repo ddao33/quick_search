@@ -1,6 +1,7 @@
 name: quick_search
 description: A package allow you to create a search repository for quick search.
 version: 0.1.0
+homepage: https://github.com/ddao33/quick_search
 
 environment:
   sdk: ^3.5.2
