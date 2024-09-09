@@ -30,7 +30,7 @@ class _SearchWidgetState extends State<SearchWidget> {
     return Column(
       children: [
         TextField(
-          decoration: InputDecoration(
+          decoration: const InputDecoration(
             hintText: 'Search',
           ),
           onChanged: (value) async {

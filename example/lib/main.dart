@@ -31,8 +31,8 @@ class HomePage extends StatelessWidget {
         appBar: AppBar(
           title: const Text('Quick Search Example'),
         ),
-        body: Padding(
-          padding: const EdgeInsets.all(8.0),
+        body: const Padding(
+          padding: EdgeInsets.all(8.0),
           child: SearchWidget(),
         ));
   }
