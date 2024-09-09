@@ -1,12 +1,10 @@
 name: quick_search
-description: A starting point for Dart libraries or applications.
-version: 1.0.0
-# repository: https://github.com/my_org/my_repo
+description: A package allow you to create a search repository for quick search.
+version: 0.1.0
 
 environment:
   sdk: ^3.5.2
 
-# Add regular dependencies here.
 dependencies:
   # path: ^1.8.0
 
