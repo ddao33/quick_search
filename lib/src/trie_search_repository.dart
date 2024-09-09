@@ -5,8 +5,13 @@ class TrieNode<T> {
   Set<T> items = {};
 }
 
+/// A search repository that uses a Trie data structure to store and search items.
+/// Parameters:
+/// - [getSearchKeys]: A function that takes an item and returns a list of search keys.
+/// - [allowSepcialCharacter]: Whether to allow special characters in the search keys.
 class TrieSearchRepository<T> implements BaseSearchRepository<T> {
   final TrieNode<T> root = TrieNode<T>();
+
   final List<String> Function(T) getSearchKeys;
   final bool allowSepcialCharacter;
 
