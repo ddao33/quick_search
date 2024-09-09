@@ -1,3 +1,3 @@
 library;
 
-export 'src/quick_search_base.dart';
+export 'src/trie_search_repository.dart';
