@@ -15,12 +15,16 @@ class TrieSearchRepository<T> implements BaseSearchRepository<T> {
     this.getSearchKeys, {
     this.allowSepcialCharacter = false,
   }) {
+    addItems(items);
+  }
+
+  void addItems(List<T> items) {
     for (var item in items) {
-      addItem(item);
+      _addItem(item);
     }
   }
 
-  void addItem(T item) {
+  void _addItem(T item) {
     for (var key in getSearchKeys(item)) {
       _insertItem(key, item);
     }
