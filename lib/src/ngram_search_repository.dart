@@ -1,13 +1,6 @@
 import 'package:quick_search/src/base_search_repository.dart';
 import 'package:quick_search/src/utils.dart';
 
-class SearchItem {
-  final String id;
-  final List<String> searchStrings;
-
-  SearchItem({required this.id, required this.searchStrings});
-}
-
 class NgramSearchRepository {
   final DatabaseOperations dbOps;
   final int n;
@@ -21,6 +14,12 @@ class NgramSearchRepository {
     this.n = 2,
     this.formatText,
   });
+
+  List<Map<String, dynamic>>? _allItems;
+
+  Future<void> _initializeAllItems() async {
+    _allItems ??= await dbOps.getAll();
+  }
 
   Future<void> addItem({required SearchItem item}) async {
     Map<String, List<String>> ngramsMap = {};
@@ -36,6 +35,7 @@ class NgramSearchRepository {
       'searchStrings': item.searchStrings,
       'ngramsMap': ngramsMap, // Map of search strings and their n-grams
     });
+    refreshAllItems();
   }
 
   Future<void> addItems(
@@ -63,17 +63,17 @@ class NgramSearchRepository {
     }
 
     await dbOps.batchPut(batchEntries);
+    refreshAllItems();
   }
 
   Future<List<String>> search(String query, {double threshold = 0.2}) async {
+    await _initializeAllItems();
     List<String> queryNGrams =
         _generateNGrams(query, n, formatText: formatText);
     List<Map<String, dynamic>> matchingProducts = [];
 
-    var snapshot = await dbOps.getAll();
-
     // Use parallel processing for better performance
-    await Future.wait(snapshot.map((record) async {
+    await Future.wait(_allItems!.map((record) async {
       final id = record['id'];
       Map<String, List<Object?>> ngramsMap =
           Map<String, List<Object?>>.from(record['ngramsMap']);
@@ -101,6 +101,10 @@ class NgramSearchRepository {
     // Sort the result by similarity
     matchingProducts.sort((a, b) => b['similarity'].compareTo(a['similarity']));
     return matchingProducts.map((product) => product['id'] as String).toList();
+  }
+
+  Future<void> refreshAllItems() async {
+    _allItems = await dbOps.getAll();
   }
 }
 

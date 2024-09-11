@@ -8,3 +8,10 @@ abstract class DatabaseOperations {
 }
 
 typedef TextFormatter = String Function(String text);
+
+class SearchItem {
+  final String id;
+  final List<String> searchStrings;
+
+  SearchItem({required this.id, required this.searchStrings});
+}
