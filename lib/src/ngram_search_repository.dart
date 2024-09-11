@@ -4,21 +4,24 @@ import 'package:quick_search/src/utils.dart';
 class NgramSearchRepository {
   final DatabaseOperations dbOps;
   final int n;
-
   final TextFormatter? formatText;
+  final bool lazyLoad;
 
-  /// formatText is applied before n-gram generation.
-  /// default is to convert to lowercase and remove special characters.
+  List<Map<String, dynamic>>? _allItems;
+
   NgramSearchRepository({
     required this.dbOps,
     this.n = 2,
     this.formatText,
-  });
-
-  List<Map<String, dynamic>>? _allItems;
+    this.lazyLoad = false,
+  }) {
+    if (!lazyLoad) {
+      _initializeAllItems();
+    }
+  }
 
   Future<void> _initializeAllItems() async {
-    _allItems ??= await dbOps.getAll();
+    _allItems = await dbOps.getAll();
   }
 
   Future<void> addItem({required SearchItem item}) async {
@@ -35,7 +38,7 @@ class NgramSearchRepository {
       'searchStrings': item.searchStrings,
       'ngramsMap': ngramsMap, // Map of search strings and their n-grams
     });
-    refreshAllItems();
+    _refreshAllItems();
   }
 
   Future<void> addItems(
@@ -63,11 +66,13 @@ class NgramSearchRepository {
     }
 
     await dbOps.batchPut(batchEntries);
-    refreshAllItems();
+    _refreshAllItems();
   }
 
   Future<List<String>> search(String query, {double threshold = 0.2}) async {
-    await _initializeAllItems();
+    if (lazyLoad) {
+      await _initializeAllItems();
+    }
     List<String> queryNGrams =
         _generateNGrams(query, n, formatText: formatText);
     List<Map<String, dynamic>> matchingProducts = [];
@@ -103,7 +108,7 @@ class NgramSearchRepository {
     return matchingProducts.map((product) => product['id'] as String).toList();
   }
 
-  Future<void> refreshAllItems() async {
+  Future<void> _refreshAllItems() async {
     _allItems = await dbOps.getAll();
   }
 }
