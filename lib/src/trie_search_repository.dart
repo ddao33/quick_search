@@ -1,3 +1,4 @@
+import 'package:quick_search/quick_search.dart';
 import 'package:quick_search/src/base_search_repository.dart';
 
 class TrieNode<T> {
@@ -13,12 +14,11 @@ class TrieSearchRepository<T> implements BaseSearchRepository<T> {
   final TrieNode<T> root = TrieNode<T>();
 
   final List<String> Function(T) getSearchKeys;
-  final bool allowSepcialCharacter;
-
+  final TextFormatter? textFormatter;
   TrieSearchRepository(
     List<T> items,
     this.getSearchKeys, {
-    this.allowSepcialCharacter = false,
+    this.textFormatter,
   }) {
     addItems(items);
   }
@@ -36,15 +36,16 @@ class TrieSearchRepository<T> implements BaseSearchRepository<T> {
   }
 
   void _insertItem(String key, T item) {
-    List<String> words = key.toLowerCase().split(RegExp(r'\s+'));
+    final formattedKey =
+        textFormatter == null ? defaultTextFormatter(key) : textFormatter!(key);
+
+    List<String> words = formattedKey.split(RegExp(r'\s+'));
     for (String word in words) {
       TrieNode<T> node = root;
       for (int i = 0; i < word.length; i++) {
         String char = word[i];
-        if (allowSepcialCharacter || char.contains(RegExp(r'[a-z0-9]'))) {
-          node.children.putIfAbsent(char, () => TrieNode<T>());
-          node = node.children[char]!;
-        }
+        node.children.putIfAbsent(char, () => TrieNode<T>());
+        node = node.children[char]!;
       }
       node.items.add(item);
     }
@@ -52,13 +53,13 @@ class TrieSearchRepository<T> implements BaseSearchRepository<T> {
 
   @override
   Future<List<T>> search(String query) async {
-    List<String> words = query.toLowerCase().split(RegExp(r'\s+'));
+    final formattedQuery = textFormatter == null
+        ? defaultTextFormatter(query)
+        : textFormatter!(query);
+    List<String> words = formattedQuery.split(RegExp(r'\s+'));
     Set<T>? results;
 
     for (String word in words) {
-      word = allowSepcialCharacter
-          ? word
-          : word.replaceAll(RegExp(r'[^a-z0-9]'), '');
       Set<T> wordResults = _searchWord(word);
 
       if (results == null) {

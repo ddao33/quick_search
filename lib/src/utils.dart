@@ -6,3 +6,5 @@ abstract class DatabaseOperations {
   /// String is the key, Map<String, dynamic> is the value.
   Future<void> batchPut(List<MapEntry<String, Map<String, dynamic>>> entries);
 }
+
+typedef TextFormatter = String Function(String text);

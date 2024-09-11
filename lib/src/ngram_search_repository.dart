@@ -1,3 +1,4 @@
+import 'package:quick_search/src/base_search_repository.dart';
 import 'package:quick_search/src/utils.dart';
 
 class SearchItem {
@@ -11,7 +12,7 @@ class NgramSearchRepository {
   final DatabaseOperations dbOps;
   final int n;
 
-  final Function(String text)? formatText;
+  final TextFormatter? formatText;
 
   /// formatText is applied before n-gram generation.
   /// default is to convert to lowercase and remove special characters.
@@ -108,9 +109,7 @@ List<String> _generateNGrams(
   int n, {
   Function(String text)? formatText,
 }) {
-  text = formatText != null
-      ? formatText(text)
-      : text.toLowerCase().replaceAll(RegExp(r'[^\w\s]'), '');
+  text = formatText != null ? formatText(text) : defaultTextFormatter(text);
   List<String> ngrams = [];
   for (int i = 0; i <= text.length - n; i++) {
     ngrams.add(text.substring(i, i + n));
