@@ -11,14 +11,23 @@ class NgramSearchRepository {
   final DatabaseOperations dbOps;
   final int n;
 
-  NgramSearchRepository({required this.dbOps, required this.n});
+  final Function(String text)? formatText;
+
+  /// formatText is applied before n-gram generation.
+  /// default is to convert to lowercase and remove special characters.
+  NgramSearchRepository({
+    required this.dbOps,
+    this.n = 2,
+    this.formatText,
+  });
 
   Future<void> addItem({required SearchItem item}) async {
     Map<String, List<String>> ngramsMap = {};
 
     // Generate n-grams for each search string and store them in a map
     for (var searchString in item.searchStrings) {
-      ngramsMap[searchString] = _generateNGrams(searchString, n);
+      ngramsMap[searchString] =
+          _generateNGrams(searchString, n, formatText: formatText);
     }
 
     await dbOps.put(item.id, {
@@ -39,9 +48,9 @@ class NgramSearchRepository {
 
       Map<String, List<String>> ngramsMap = {};
 
-      // Generate n-grams for each search string and store them in a map
       for (var searchString in searchStrings) {
-        ngramsMap[searchString] = _generateNGrams(searchString, n);
+        ngramsMap[searchString] =
+            _generateNGrams(searchString, n, formatText: formatText);
       }
 
       // Prepare the entry for batch operation
@@ -56,7 +65,8 @@ class NgramSearchRepository {
   }
 
   Future<List<String>> search(String query, {double threshold = 0.2}) async {
-    List<String> queryNGrams = _generateNGrams(query, n);
+    List<String> queryNGrams =
+        _generateNGrams(query, n, formatText: formatText);
     List<Map<String, dynamic>> matchingProducts = [];
 
     var snapshot = await dbOps.getAll();
@@ -69,7 +79,6 @@ class NgramSearchRepository {
 
       double highestSimilarity = 0;
 
-      // Use more efficient iteration
       for (var targetNGrams in ngramsMap.values) {
         double similarity =
             _jaccardSimilarity(queryNGrams, targetNGrams.cast<String>());
@@ -94,9 +103,14 @@ class NgramSearchRepository {
   }
 }
 
-List<String> _generateNGrams(String text, int n) {
-  // Convert text to lowercase and remove special characters
-  text = text.toLowerCase().replaceAll(RegExp(r'[^\w\s]'), '');
+List<String> _generateNGrams(
+  String text,
+  int n, {
+  Function(String text)? formatText,
+}) {
+  text = formatText != null
+      ? formatText(text)
+      : text.toLowerCase().replaceAll(RegExp(r'[^\w\s]'), '');
   List<String> ngrams = [];
   for (int i = 0; i <= text.length - n; i++) {
     ngrams.add(text.substring(i, i + n));
