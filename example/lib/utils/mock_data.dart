@@ -1,4 +1,4 @@
-import 'package:example/data/product.dart';
+import 'package:example/model/product.dart';
 
 Future<List<Product>> getProducts() async {
   return [

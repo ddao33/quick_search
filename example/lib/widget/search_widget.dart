@@ -1,6 +1,6 @@
-import 'package:example/data/product.dart';
+import 'package:example/model/product.dart';
 import 'package:flutter/material.dart';
-import 'package:example/data/product_search_repository.dart';
+import 'package:example/repository/product_search_repository.dart';
 
 class SearchWidget extends StatefulWidget {
   const SearchWidget({super.key});
