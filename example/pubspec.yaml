@@ -14,6 +14,8 @@ dependencies:
 
   quick_search:
     path: ../
+  sembast: 
+  path_provider:
 
 dev_dependencies:
   flutter_test:
