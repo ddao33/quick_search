@@ -8,10 +8,10 @@ class Product {
 Future<List<Product>> getProducts() async {
   return [
     Product(en: 'apple', pinyin: 'pingguo'),
+    Product(en: 'green apple', pinyin: 'lvpingguo'),
     Product(en: 'banana', pinyin: 'xiangjiao'),
     Product(en: 'orange', pinyin: 'chengzi'),
-    Product(en: 'green apple', pinyin: 'lv pingguo'),
-    Product(en: 'red dragon fruit', pinyin: 'hong huolongguo'),
+    Product(en: 'red dragon fruit', pinyin: 'honghuolongguo'),
     Product(en: 'golden kiwi', pinyin: 'jin qiyiguo'),
     Product(en: 'honeydew melon', pinyin: 'mi gua'),
     Product(en: 'passion fruit', pinyin: 'bai xiang guo'),
